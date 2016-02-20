@@ -7,3 +7,4 @@ dist
 braingames.spec
 braingames-win.zip
 venv/
+*.pyc
