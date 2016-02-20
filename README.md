@@ -5,7 +5,7 @@ The game portion is based on the work by aviaryan at [https://github.com/aviarya
 Install the dependencies (preferably from an activated `virtualenv`):
 
 ```shell
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 ```
 
 Run the trap:

@@ -18,7 +18,7 @@ class GameArea():
         self.positive = 10
         self.negative = -20
         self.syncKey = False
-        self.gameTime = 45
+        self.gameTime = 30
         # self.timeLeft self.quesLeft
         self.numQuestions = 10
         self.gameStatus = -1  # not started | started | over
