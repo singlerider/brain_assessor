@@ -1,6 +1,8 @@
+import time
+
 import pyglet
-from classifier.utils import draw
 from classifier.features import settings
+from classifier.utils import draw
 
 
 class GameArea():
@@ -44,6 +46,9 @@ class GameArea():
             'classifier/resources/correct.wav', streaming=False)
         self.soundFail = pyglet.media.load(
             'classifier/resources/fail.wav', streaming=False)
+
+        with open("last_game.csv", "w", encoding='utf8', newline='') as f:
+            f.write("")
 
         if color:
             self.setBackgroundColor(color)
@@ -98,13 +103,14 @@ class GameArea():
         '''
         Updates the score
         '''
-        # self.updateScoreFlyer(str(by))
         if by == self.positive:
             self.soundCorrect.play()
         elif by == self.negative:
             self.soundFail.play()
         self.score += by
         self.lblScore.text = self.lblScoreHTML()
+        values = [by, time.time()]
+        settings.save_csv(values)
 
     def setBackgroundColor(self, color):
         if str(type(color)).find('str'):
