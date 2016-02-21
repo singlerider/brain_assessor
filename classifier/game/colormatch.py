@@ -6,9 +6,13 @@ import time
 class ColorMatchGame(boolgame.BoolGame, colors.Colors):
 
     title = 'Color Match'
-    color = '#0B3526'
+    color = '#2B2B2B'
     descriptiontext = 'Check if previous color is same as the current one'
     gameid = 'colormatch'
+    blue = (6, 136, 148)
+    red = (233, 102, 44)
+    green = (0, 172, 101)
+    yellow = (235, 175, 60)
 
     def __init__(self, width=700, height=500):
 
