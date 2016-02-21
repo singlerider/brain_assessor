@@ -12,7 +12,6 @@ refreshRate <- 300
 dataWindow <- 20
 numDataPoints <- 0
 dataVector <- rep (NA, dataWindow)
-queue <- vector()
 
 con  <- socketConnection(host="", port = 6011, blocking=TRUE,
                          server=TRUE, open="r+")
@@ -26,7 +25,7 @@ getDataFromSocket <- function() {
                                 warning (e)
                                 return (NA)
                         })
-        writeLines ("1", con)
+        writeLines ("1", con, sep="")
         if (length (data)==0) data <- NA
         return (as.numeric (data))
 }
@@ -36,16 +35,6 @@ getData <- function (...) {
         return (data)
 }
 
-enqueue <- function (queue, newVector) {
-        return (c (queue, newVector))
-}
-
-dequeue <- function (queue) {
-        first <- queue[1]
-        queue <- queue[-1]
-        return (list (first, queue))
-}
-
 shinyServer(function(input, output, session) {
         
         data <- 0.5
@@ -53,11 +42,7 @@ shinyServer(function(input, output, session) {
         
                 invalidateLater (refreshRate, session)
                 
-                queue <<- enqueue (queue, getDataFromSocket())
-                
-                retVal <- dequeue (queue)
-                data <- retVal[[1]]
-                queue <<- retVal[[2]]
+                data <- getDataFromSocket()
                 
                 numDataPoints <<- numDataPoints + 1
                 
@@ -73,14 +58,16 @@ shinyServer(function(input, output, session) {
                 
                 layout(p, 
                        xaxis = list(range = c(-1, 1), autorange = FALSE,
-                                       autotick = FALSE),
+                                       showticklabels=FALSE, title=""),
                        yaxis = list(title="Score", range = c(0, 1), autorange=FALSE))
         
         })
         
         output$timeFeedbackPlot <- renderPlotly({
                 invalidateLater (refreshRate, session)
-                gg <- qplot (1:dataWindow, dataVector, geom="line")
+                gg <- qplot (1:dataWindow, dataVector, geom="line") + 
+                        xlab ("Time (s)") +
+                        ylab ("Score")
                 
                 ggplotly (gg)
         })
