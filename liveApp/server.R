@@ -20,13 +20,13 @@ con  <- socketConnection(host="", port = 6011, blocking=TRUE,
 getDataFromSocket <- function() {
                 
         data <- tryCatch ({
-                                readLines(con)
+                                readLines (con, 1)
                         },
                         error = function (e) {
                                 warning (e)
                                 return (NA)
                         })
-        #writeLines (data, con)
+        writeLines ("1", con)
         if (length (data)==0) data <- NA
         return (as.numeric (data))
 }
@@ -49,18 +49,16 @@ dequeue <- function (queue) {
 shinyServer(function(input, output, session) {
         
         data <- 0.5
-        
         output$liveFeedbackPlot <- renderPlotly({
-
+        
                 invalidateLater (refreshRate, session)
+                
                 queue <<- enqueue (queue, getDataFromSocket())
                 
-                browser()
                 retVal <- dequeue (queue)
                 data <- retVal[[1]]
                 queue <<- retVal[[2]]
                 
-                print (data)
                 numDataPoints <<- numDataPoints + 1
                 
                 if (numDataPoints <= dataWindow)
