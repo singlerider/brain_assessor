@@ -14,7 +14,7 @@ class SubjectiveGame(gamearea.GameArea):
         self.negative = 0
 
         self.answerBox = draw.rectangle(
-            self.width // 2 - 100, self.description.y - 200, 200, 50, filled=True, color=draw.color2Array('95a799'))
+            self.width // 2 - 100, self.description.y - 200, 200, 50, filled=True, color=draw.color2Array('ff0000'))
         self.lblAnswer = pyglet.text.Label(
             '', x=self.width // 2, anchor_x='center', y=self.description.y - 200 - 10, anchor_y='top', font_size=20)
 

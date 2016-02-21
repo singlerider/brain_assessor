@@ -9,3 +9,5 @@ braingames-win.zip
 venv/
 *.pyc
 .Rproj.user
+*.csv
+

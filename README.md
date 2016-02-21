@@ -6,6 +6,8 @@ Install the dependencies (preferably from an activated `virtualenv`):
 
 ```shell
 pip3 install -r requirements.txt
+pip install -r requirements2.txt
+brew install liblo
 ```
 
 Run the trap:

@@ -1,3 +1,4 @@
+import csv
 import json
 import os
 from datetime import date
@@ -6,7 +7,7 @@ from datetime import date
 defaultSettings = {
     'positive': 10,
     'negative': -20,
-    'gameTime': 3
+    'gameTime': 45
 }
 fname = 'braingames.json'
 
@@ -16,16 +17,22 @@ def loadSettings():
     loads the settings.
     creates the settings file if needed
     '''
-    if not os.path.isfile(fname):
-        saveSettings(defaultSettings)
-        config = defaultSettings
-    else:
-        config = json.loads(open(fname, 'r').read())
+    saveSettings(defaultSettings)
+    config = defaultSettings
     return config
 
 
 def saveSettings(config):
     open(fname, 'w').write(json.dumps(config, indent=4, sort_keys=True))
+
+
+def save_csv(values):
+    if values[0] > 0:
+        values[0] = 1
+    else:
+        values[0] = 0
+    with open("last_game.csv", "a", newline='') as f:
+        f.write(str(values[0]) + "," + str(values[1]) + "\n")
 
 
 def saveScore(gameid, score):
