@@ -7,7 +7,7 @@ client <- function(){
         text <- as.character (num[curr_number])
         writeLines (text)
         write_resp <- writeLines(text, con)
-        Sys.sleep (0.1)
+        Sys.sleep (0.3)
         }
   
     close(con)

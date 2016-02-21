@@ -8,7 +8,7 @@
 library(shiny)
 library (ggplot2)
 
-refreshRate <- 100
+refreshRate <- 300
 dataWindow <- 20
 numDataPoints <- 0
 dataVector <- rep (NA, dataWindow)
@@ -18,9 +18,15 @@ con  <- socketConnection(host="", port = 6011, blocking=TRUE,
 
 getDataFromSocket <- function() {
                 
-        data <- readLines(con, 1)
+        data <- tryCatch ({
+                                readLines(con, 1)
+                        },
+                        error = function (e) {
+                                warning (e)
+                                return (NA)
+                        })
         #writeLines (data, con)
-
+        if (length (data)==0) data <- NA
         return (as.numeric (data))
 }
 
@@ -32,13 +38,13 @@ getData <- function (...) {
 shinyServer(function(input, output, session) {
         
         data <- 0.5
-        #on.exit (close (con))
         
         output$liveFeedbackPlot <- renderPlotly({
 
                 invalidateLater (refreshRate, session)
                 data <- getDataFromSocket()
                 
+                print (data)
                 numDataPoints <<- numDataPoints + 1
                 
                 if (numDataPoints <= dataWindow)
@@ -65,4 +71,7 @@ shinyServer(function(input, output, session) {
                 ggplotly (gg)
         })
 
+        session$onSessionEnded (function() {
+                close (con)
+        })
 })
