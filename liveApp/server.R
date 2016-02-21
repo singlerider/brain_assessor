@@ -8,7 +8,7 @@
 library(shiny)
 library (ggplot2)
 
-refreshRate <- 300
+refreshRate <- 100
 dataWindow <- 20
 numDataPoints <- 0
 dataVector <- rep (NA, dataWindow)
