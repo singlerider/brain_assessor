@@ -6,7 +6,7 @@ from datetime import date
 defaultSettings = {
     'positive': 10,
     'negative': -20,
-    'gameTime': 3
+    'gameTime': 45
 }
 fname = 'braingames.json'
 
