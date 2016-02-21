@@ -2,9 +2,12 @@ client <- function(){
     con <- socketConnection(host="localhost", port = 6011, blocking=TRUE,
                             server=FALSE, open="r+")
     num <- runif (100, 0, 1) 
+    curr_number <- 1
     
-    for (curr_number in 1:length (num)) {
+    while (TRUE) {
         text <- as.character (num[curr_number])
+        text <- as.character (sample (c (0, 1), 1))
+        curr_number <- curr_number + 1
         read_resp <- 0
         
         while (read_resp != "1") {

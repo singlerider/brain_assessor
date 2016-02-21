@@ -7,11 +7,15 @@
 
 library(shiny)
 library (ggplot2)
+library (forecast)
 
-refreshRate <- 100
+refreshRate <- 300
 dataWindow <- 20
 numDataPoints <- 0
 dataVector <- rep (NA, dataWindow)
+movingAvgWindow <- 5
+movingAvgLength <- dataWindow - movingAvgWindow + 1
+movingAvg <- rep (NA, movingAvgLength)
 
 con  <- socketConnection(host="", port = 6011, blocking=TRUE,
                          server=TRUE, open="r+")
@@ -25,7 +29,7 @@ getDataFromSocket <- function() {
                                 warning (e)
                                 return (NA)
                         })
-        writeLines ("1", con, sep="")
+        writeLines ("1", con, sep="\n")
         if (length (data)==0) data <- NA
         return (as.numeric (data))
 }
@@ -41,35 +45,47 @@ shinyServer(function(input, output, session) {
         output$liveFeedbackPlot <- renderPlotly({
         
                 invalidateLater (refreshRate, session)
-                
+
                 data <- getDataFromSocket()
                 
                 numDataPoints <<- numDataPoints + 1
                 
-                if (numDataPoints <= dataWindow)
+                if (numDataPoints <= dataWindow) {
                         dataVector[numDataPoints] <<- data
+                        p <- plot_ly(x = 0, y=data, type = "bar", 
+                                     marker=list (color=fillColor))
+                }
                 else {
                         dataVector <<- dataVector[2:dataWindow]
                         dataVector[dataWindow] <<- data
+                        movingAvg <<- na.omit (ma (dataVector, movingAvgWindow))
+                        print (movingAvg)
+                        p <- plot_ly(x = 0, y=movingAvg[movingAvgLength], type = "bar", 
+                                     marker=list (color=fillColor))
                 }
                                 
-                fillColor <- ifelse (data < 0.5, "rgb(233, 102, 44)", "rgb(0, 172, 101)")
-                p <- plot_ly(x = 0, y=data, type = "bar", marker=list (color=fillColor))
+                fillColor <- ifelse (movingAvg[movingAvgLength] < 0.5, 
+                                     "rgb(233, 102, 44)", "rgb(0, 172, 101)")
+                
                 
                 layout(p, 
                        xaxis = list(range = c(-1, 1), autorange = FALSE,
                                        showticklabels=FALSE, title=""),
-                       yaxis = list(title="Score", range = c(0, 1), autorange=FALSE))
+                       yaxis = list(title="Score", range = c(0, 1), showticklabels=FALSE,
+                                    autorange=FALSE))
         
         })
         
         output$timeFeedbackPlot <- renderPlotly({
                 invalidateLater (refreshRate, session)
-                gg <- qplot (1:dataWindow, dataVector, geom="line") + 
-                        xlab ("Time (s)") +
-                        ylab ("Score")
-                
-                ggplotly (gg)
+                if (numDataPoints > dataWindow) {
+                        gg <- qplot (1:movingAvgLength, movingAvg, geom="line") + 
+                                xlab ("Time (s)") +
+                                ylab ("Score") +
+                                ylim (0, 1)
+                        
+                        ggplotly (gg)
+                }
         })
 
         session$onSessionEnded (function() {
