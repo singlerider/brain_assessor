@@ -1,5 +1,6 @@
 from classifier.game import boolgame
 from classifier.utils import draw, maths, colors
+import time
 
 
 class ColorMatchGame(boolgame.BoolGame, colors.Colors):
